@@ -1,0 +1,124 @@
+test.com
+Following configurations will be done in the server machine (BIND server 10.0.2.15)
+
+Setup apache and create a basic webpage
+sudo apt-get install apache2
+
+Move into, /var/www
+ Create a simple html file.
+sudo vi test.html
+
+<html>
+	<body>
+
+		www.bind9test.com
+	</body>
+</html>
+
+Try to ping www.bind9test.lab and observe
+ping www.bind9test.lab
+
+ Install utilities
+sudo apt-get install bind9 bind9utilscd 
+
+Configure forwarders
+ Move into /etc/bind
+sudo vim named.conf.options
+
+Update the forwarders section with adding relevant IP
+forworder to default gateway address
+
+Configure zone information
+sudo vim named.conf.local
+
+Update
+zone "bind9test.lab"{
+        type master;
+        file "/etc/bind/zones/db.bind9test.lab";
+};
+zone "16.0.10.in*addr.arpa"{
+        type master;
+        file "/etc/bind/zones/db.192";
+};
+
+
+Move into, /etc/bind
+ Make a directory for zones
+sudo mkdir zones
+
+
+Move into newly created “zones” directory
+cd zones
+ Copy the default skeleton file into zones directory
+ Edit the copied file
+sudo cp ../db.local db.bind9test.lab
+sudo vim db.bind9test.lab
+
+Update the file
+ Add IP configurations
+bind9test.lab.  IN      NS      ip-10-0-2-15.bind9test.lab.
+bind9test.lab.  IN      A       10.0.2.15
+ip-10-0-2-15    IN      A       10.0.2.15
+ip-10-0-2-16    IN      A       10.0.2.16
+www             IN      A       10.0.2.15
+
+Create reverse zone file
+sudo cp ../db.127 db.10
+sudo vim db.10
+
+Update the file
+ Serial number should be same as the previous file
+ Add IP configurations
+
+         IN     NS      ip-10-0-2-15.
+15       IN     PTR     ip-10-0-2-15.bind9test.lab.
+16       IN     PTR     ip-10-0-2-16.bind9test.lab.
+15       IN     PTR     www.bind9test.lab.
+
+Check configuration validity
+
+named-checkzone bind9test.lab /etc/bind/zones/db.bind9test.lab
+named-checkzone bind9test.lab /etc/bind/zones/db.10
+
+type cd
+cd /etc
+
+Edit local resolve file for local DNS entries
+sudo vim /etc/resolv.conf
+change.....
+nameserver 10.0.2.15
+nameserver 10.0.2.2
+search bind9test.lab
+domain bind9test.lab
+
+cd init.d
+Restart bind servers
+ Do a nslookup and observe the output
+sudo systemctl restart bind9.service
+
+Do a nslookup and observe the output
+nslookup bind9test.lab
+nslookup 10.0.2.15
+
+Verify the connection
+ping bind9test.lab
+ping www.bind9test.lab
+
+Following configurations will be done in the client machine (192.168.116.134)
+• Try to ping server machine
+------------------------------
+cd Desktop
+ping 10.0.2.15
+
+Edit “resolv.conf” file
+Sudo vim /etc/resolv.conf
+
+change.....
+nameserver 10.0.2.15
+nameserver 10.0.2.2
+search bind9test.lab
+domain bind9test.lab
+
+Verify the connection
+ping bind9test.lab
+ping www.bind9test.lab

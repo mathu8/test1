@@ -1,0 +1,44 @@
+Lab 01-Apache self-signed SSl Certificate
+
+1. Update the sudo.
+	sudo apt update
+2. Install Apache2 and OpenSSL
+	sudo apt-get install apache2 apache2-doc apache2-utils openssl
+3.Check whether your webserver is up and running.
+4.Create self-signed SSL Certificate
+  Create a folder to store key and the certificate
+
+	sudo mkdir /etc/apache2/ssl
+ ls -l
+
+5.Generate the key and the certificate
+	sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apachekeynew.key -out /etc/apache2/ssl/apachekeynew.cert
+
+6.Go to SSL directory that you created, you’ll see the generated key file and the certificate file.
+
+	sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.cert
+
+7.apachekeynew.cert
+	cat apachekeynew.cert
+
+8.apache key
+	cat apachekeynew.key
+
+9.Enable apache SSL module
+	sudo a2enmod ssl
+
+10.Edit default VHost file
+Change directory to 
+	Cd /etc/apache2/sites-available
+
+11.Open the ‘default-ssl.conf’ file to make changes 
+	sudo vim default-ssl.conf
+
+12.Comment existing key and certificate file paths
+Add newly generated key and certificate file paths as shown in the following figure.
+
+13.Enable VHost configuration 
+	sudo a2ensite default-ssl.conf
+
+14.Restart apache server 
+	systemctl reload apache2
